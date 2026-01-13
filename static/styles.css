@@ -1,0 +1,344 @@
+:root{
+    --bg:#0b1220;
+  
+    /* Panels (idle vs active) */
+    --livePanel: rgba(15, 26, 51, 0.10);        /* VERY transparent */
+    --controlsPanel: rgba(15, 26, 51, 0.14);     /* transparent */
+    --livePanelActive: rgba(10, 16, 30, 0.30);   /* darken a bit during conversation */
+  
+    --panelBorder: rgba(255,255,255,0.10);
+    --panelBorderStrong: rgba(255,255,255,0.14);
+  
+    --text:#e8eefc;
+    --muted:#a9b6d3;
+    --muted2:#c7d2ee;
+  
+    --btnBorder: rgba(255,255,255,0.14);
+  
+    --green:#16a34a;
+    --red:#ef4444;
+    --blue:#3b82f6;
+  }
+  
+  /* ---- Page background image ---- */
+  body.bg{
+    margin:0;
+    font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial;
+    color:var(--text);
+    background: var(--bg);
+    min-height:100vh;
+    overflow-x:hidden;
+  }
+  
+  /* Background image layer */
+  body.bg::before{
+    content:"";
+    position:fixed;
+    inset:0;
+    background-image: url("/static/mmt-bg.webp");
+    background-size: cover;
+    background-position: center;
+    background-repeat:no-repeat;
+    transform: scale(1.03);
+  
+    /* Make image POP more */
+    filter: saturate(1.14) contrast(1.10) brightness(1.18);
+    z-index:-2;
+  }
+  
+  /* Dramatically lighter overlay (so background is visible) */
+  .bgOverlay{
+    position:fixed;
+    inset:0;
+  
+    /* Much lighter than before */
+    background:
+      radial-gradient(1200px 700px at 22% 10%, rgba(0,0,0,0.02), rgba(0,0,0,0.14)),
+      linear-gradient(180deg, rgba(11,18,32,0.06), rgba(11,18,32,0.20));
+    z-index:-1;
+  }
+  
+  /* ---- Layout ---- */
+  .wrap{ max-width: 1100px; margin: 18px auto; padding: 0 16px 30px; }
+  
+  .topbar{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    gap:12px;
+    padding: 10px 6px 16px;
+  }
+  
+  .brand{ display:flex; align-items:center; gap:12px; }
+  
+  .brandMark{
+    width:42px; height:42px; border-radius:14px;
+    display:grid; place-items:center;
+    background: rgba(15, 26, 51, 0.20);
+    border:1px solid rgba(255,255,255,0.14);
+    box-shadow: 0 14px 40px rgba(0,0,0,0.22);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+  }
+  
+  .brandTitle{ font-weight:800; font-size:18px; letter-spacing:0.2px; }
+  .brandSub{ color:var(--muted); font-size:13px; margin-top:2px; }
+  
+  .linkBtn{
+    text-decoration:none;
+    background: rgba(15, 26, 51, 0.18);
+    border:1px solid rgba(255,255,255,0.16);
+    color:var(--text);
+    padding:10px 12px;
+    border-radius:12px;
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+  }
+  
+  .grid{
+    display:grid;
+    grid-template-columns: 1.5fr 0.9fr;
+    gap:14px;
+  }
+  
+  @media (max-width: 900px){
+    .grid{ grid-template-columns: 1fr; }
+  }
+  
+  /* ---- Panels ---- */
+  .panel{
+    border-radius: 18px;
+    box-shadow: 0 18px 55px rgba(0,0,0,0.22);
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+    overflow:hidden;
+    border: 1px solid var(--panelBorder);
+  }
+  
+  /* Default panel bg is set by modifiers below */
+  
+  /* Live conversation: extra transparent (idle) */
+  .panel.live{
+    background: var(--livePanel);
+  }
+  
+  /* Controls: a touch more visible but still transparent */
+  .panel.controlsPanel{
+    background: var(--controlsPanel);
+  }
+  
+  /* When conversation starts, we’ll add this class via JS:
+     document.body.classList.add("activeCall")
+  */
+  body.activeCall .panel.live{
+    background: var(--livePanelActive);
+    border-color: var(--panelBorderStrong);
+  }
+  
+  /* Header */
+  .panelHeader{
+    display:flex;
+    justify-content:space-between;
+    align-items:flex-start;
+    gap:10px;
+    padding: 14px 14px 10px;
+    border-bottom: 1px solid rgba(255,255,255,0.10);
+  }
+  
+  .panelTitle{ font-weight:800; font-size:15px; }
+  .panelHint{ color: var(--muted); font-size: 12.5px; margin-top:4px; }
+  
+  .statusPill{
+    color: var(--muted2);
+    font-size: 12px;
+    padding: 8px 10px;
+    border-radius: 999px;
+    background: rgba(15,26,51,0.18);
+    border:1px solid rgba(255,255,255,0.12);
+    white-space: nowrap;
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+  }
+  
+  /* ---- Chat ---- */
+  .chat{
+    padding: 14px;
+    min-height: 420px;
+    max-height: 520px;
+    overflow:auto;
+  }
+  
+  /* bubbles */
+  .bubble{
+    width: fit-content;
+    max-width: 85%;
+    padding: 11px 12px;
+    margin: 10px 0;
+    border-radius: 16px;
+    line-height: 1.35;
+    font-size: 14px;
+    border: 1px solid rgba(255,255,255,0.10);
+    box-shadow: 0 10px 25px rgba(0,0,0,0.16);
+    white-space: pre-wrap;
+  }
+  
+  .bubble.client{
+    background: rgba(15, 26, 51, 0.32);
+    border-color: rgba(255,255,255,0.12);
+  }
+  
+  .bubble.sales{
+    margin-left: auto;
+    background: rgba(17, 58, 42, 0.30);
+    border-color: rgba(255,255,255,0.12);
+  }
+  
+  /* ---- Composer ---- */
+  .composer{
+    display:flex;
+    gap:10px;
+    padding: 12px 14px 14px;
+    border-top: 1px solid rgba(255,255,255,0.10);
+    background: rgba(15,26,51,0.10);
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+  }
+  
+  .input{
+    flex: 1;
+    background: rgba(8, 14, 28, 0.20);
+    border: 1px solid rgba(255,255,255,0.14);
+    border-radius: 14px;
+    padding: 11px 12px;
+    color: var(--text);
+    outline: none;
+  }
+  .input::placeholder{ color: rgba(169,182,211,0.75); }
+  
+  .note{
+    padding: 0 14px 14px;
+    color: var(--muted);
+    font-size: 12.5px;
+  }
+  
+  /* ---- Controls ---- */
+  .controlsPanel{ padding: 14px; }
+  
+  .controls{
+    display:flex;
+    flex-direction:column;
+    gap:10px;
+    margin-top: 10px;
+  }
+  
+  .btn{
+    background: rgba(15,26,51,0.20);
+    border: 1px solid var(--btnBorder);
+    color: var(--text);
+    padding: 11px 14px;
+    border-radius: 14px;
+    cursor:pointer;
+    font-weight: 650;
+    letter-spacing: 0.2px;
+    transition: transform 0.06s ease, opacity 0.15s ease, background 0.15s ease;
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+  }
+  .btn:active{ transform: translateY(1px); }
+  .btn:disabled{ opacity: 0.55; cursor: not-allowed; }
+  
+  .btnPrimary{
+    border-color: rgba(59,130,246,0.70);
+    background: rgba(59,130,246,0.18);
+  }
+  
+  .btnDanger{
+    border-color: rgba(239,68,68,0.70);
+    background: rgba(239,68,68,0.14);
+  }
+  
+  .btnGhost{
+    background: rgba(15,26,51,0.16);
+  }
+  
+  .btnMic{ position: relative; }
+  
+  .micDot{
+    display:inline-block;
+    width:10px; height:10px;
+    border-radius: 999px;
+    margin-right: 8px;
+    background: rgba(199,210,238,0.85);
+    border: 1px solid rgba(255,255,255,0.12);
+    vertical-align: middle;
+  }
+  
+  .btnMic.listening .micDot{
+    background: rgba(239,68,68,0.95);
+    box-shadow: 0 0 0 6px rgba(239,68,68,0.16);
+  }
+  
+  .miniCard{
+    margin-top: 12px;
+    padding: 12px;
+    border-radius: 16px;
+    background: rgba(15,26,51,0.16);
+    border: 1px solid rgba(255,255,255,0.12);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+  }
+  
+  .miniTitle{ font-weight: 800; font-size: 13px; margin-bottom: 8px; }
+  .miniList{ margin: 0; padding-left: 18px; color: var(--muted2); font-size: 13px; }
+  .miniList li{ margin: 6px 0; }
+  
+  .footer{
+    margin-top: 14px;
+    color: rgba(169,182,211,0.85);
+    font-size: 12.5px;
+    text-align:center;
+  }
+  
+  /* ---- Report styles ---- */
+  .card { background: rgba(15,26,51,0.16); border:1px solid rgba(255,255,255,0.12); border-radius:16px; padding:14px; margin:12px 0; backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); }
+  .row { display:flex; justify-content:space-between; align-items:center; gap:12px; }
+  .title { font-weight:700; }
+  .pill { background: rgba(15,26,51,0.18); border:1px solid rgba(255,255,255,0.12); padding:6px 10px; border-radius:999px; }
+  .scoreBox { background: rgba(15,26,51,0.16); border:1px solid rgba(255,255,255,0.12); border-radius:16px; padding:16px; margin: 12px 0; backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); }
+  .bigScore { font-size: 36px; font-weight: 800; }
+  .smallMeta { color: rgba(169,182,211,0.95); margin-top: 6px; }
+  .ok { color:#c8ffd8; }
+  .bad { color:#ffd0d0; }
+  code { color:#cfe2ff; }
+  a { color:#bcd3ff; }
+/* ===== Darker buttons (override) ===== */
+
+.btn{
+    background: rgba(7, 12, 22, 0.42);           /* darker */
+    border: 1px solid rgba(255,255,255,0.14);
+    box-shadow: 0 12px 30px rgba(0,0,0,0.22);
+  }
+  
+  /* Start Scenario */
+  .btnPrimary{
+    background: rgba(10, 22, 45, 0.55);          /* darker blue tint */
+    border-color: rgba(59,130,246,0.72);
+  }
+  
+  /* Push to Talk */
+  .btnMic{
+    background: rgba(7, 12, 22, 0.48);           /* slightly darker than base */
+    border-color: rgba(255,255,255,0.14);
+  }
+  
+  /* End & Generate Report */
+  .btnDanger{
+    background: rgba(40, 10, 14, 0.50);          /* darker red tint */
+    border-color: rgba(239,68,68,0.72);
+  }
+  
+  /* Disabled still looks disabled but not washed-out */
+  .btn:disabled{
+    opacity: 0.45;
+  }
+    

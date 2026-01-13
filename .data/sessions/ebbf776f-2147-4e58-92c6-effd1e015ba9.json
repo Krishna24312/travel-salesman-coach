@@ -1,0 +1,232 @@
+{
+  "session_id": "ebbf776f-2147-4e58-92c6-effd1e015ba9",
+  "turn": 12,
+  "done": true,
+  "scenario_id": "honeymoon_premium",
+  "state": {
+    "slots": {
+      "travellers": "2 adults",
+      "month": "March",
+      "date_window": "mid-March (flexible by a few days)",
+      "departure_city": "Mumbai",
+      "duration": "6–8 nights (not fixed)",
+      "budget": "₹2.0L–₹3.5L total",
+      "budget_includes": "flights + hotels",
+      "pace": "relaxed",
+      "hotel_level": "premium (4–5 star)",
+      "food": "no strong preference",
+      "constraints": [
+        "avoid hectic transfers"
+      ],
+      "activity_style": "sightseeing + one light experience",
+      "avoid": [
+        "scuba",
+        "extreme adventure sports"
+      ],
+      "international_pref": "open, but prefers hassle-free"
+    },
+    "disclosed": {
+      "travellers": true,
+      "month": true,
+      "date_window": true,
+      "departure_city": false,
+      "duration": true,
+      "budget": true,
+      "budget_includes": true,
+      "pace": false,
+      "hotel_level": false,
+      "food": false,
+      "constraints": false,
+      "activity_style": true,
+      "avoid": true,
+      "international_pref": false
+    },
+    "memory": {
+      "last_client_text": "Sorry—are we discussing the trip? What details do you need from me?",
+      "asked_weather_places": {
+        "manali": true
+      },
+      "asked_kids_places": {},
+      "asked_visa_places": {},
+      "selected_place": "Hikes And Rafting",
+      "last_places": [
+        "hikes and rafting"
+      ],
+      "asked_best_value_once": false
+    },
+    "max_turns": 12
+  },
+  "transcript": [
+    {
+      "speaker": "client",
+      "text": "Hi! I’m looking to plan a trip in March with 2 adults. I’m a bit confused between places—can you shortlist options?"
+    },
+    {
+      "speaker": "salesperson",
+      "text": "Budget."
+    },
+    {
+      "speaker": "client",
+      "text": "Sorry—are we discussing the trip? What details do you need from me?"
+    },
+    {
+      "speaker": "salesperson",
+      "text": "What is your budget?"
+    },
+    {
+      "speaker": "client",
+      "text": "Budget is around ₹2.0L–₹3.5L total, ideally including flights + hotels."
+    },
+    {
+      "speaker": "salesperson",
+      "text": "Okay. And when are you planning to travel, and how many nights will you be staying?"
+    },
+    {
+      "speaker": "client",
+      "text": "We’re 2 adults. March—probably mid-March (flexible by a few days), but we can shift a bit if it helps. 6–8 nights (not fixed)."
+    },
+    {
+      "speaker": "salesperson",
+      "text": "And what kind of activities do you like to do on vacations?"
+    },
+    {
+      "speaker": "client",
+      "text": "Mostly sightseeing, plus one light activity like a short hike or a park—no scuba."
+    },
+    {
+      "speaker": "salesperson",
+      "text": "I recommend Manali."
+    },
+    {
+      "speaker": "client",
+      "text": "Manali in India sounds interesting—It could work in our budget. And how is it in March?"
+    },
+    {
+      "speaker": "salesperson",
+      "text": "March is great for travel as it is spring."
+    },
+    {
+      "speaker": "client",
+      "text": "Manali in India sounds interesting—It could work in our budget."
+    },
+    {
+      "speaker": "salesperson",
+      "text": "I can share the itinerary and hotels I've planned."
+    },
+    {
+      "speaker": "client",
+      "text": "Yes—please share a simple day-wise itinerary for Manali, best areas to stay (family-friendly), and what’s included (hotel, breakfast, transfers, sightseeing)."
+    },
+    {
+      "speaker": "salesperson",
+      "text": "Okay. Should I text you the itinerary plan we have?"
+    },
+    {
+      "speaker": "client",
+      "text": "I’d prefer to keep it on chat for now—can you share the itinerary + inclusions here?"
+    },
+    {
+      "speaker": "salesperson",
+      "text": "I recommend hikes and rafting."
+    },
+    {
+      "speaker": "client",
+      "text": "Hikes And Rafting sounds interesting—It could work in our budget."
+    },
+    {
+      "speaker": "salesperson",
+      "text": "Is it a fit?"
+    },
+    {
+      "speaker": "client",
+      "text": "Nice—can you share a simple day-wise itinerary for Hikes And Rafting, best areas to stay, and what’s included?"
+    },
+    {
+      "speaker": "salesperson",
+      "text": "Sure. But I don't have it right now. I can share it because it is in file."
+    },
+    {
+      "speaker": "client",
+      "text": "Sorry—are we discussing the trip? What details do you need from me?"
+    }
+  ],
+  "report": {
+    "overall_score": 82,
+    "metrics": {
+      "salesperson_word_share_percent": 31,
+      "question_count": 5,
+      "open_question_count": 1
+    },
+    "categories": [
+      {
+        "name": "Discovery",
+        "weight": 45,
+        "points": 27,
+        "checks": [
+          {
+            "item": "Asked departure city / origin",
+            "met": false
+          },
+          {
+            "item": "Asked dates/month",
+            "met": true
+          },
+          {
+            "item": "Asked duration (nights/days)",
+            "met": true
+          },
+          {
+            "item": "Asked budget",
+            "met": true
+          },
+          {
+            "item": "Asked pace/preferences",
+            "met": false
+          }
+        ]
+      },
+      {
+        "name": "Structure",
+        "weight": 35,
+        "points": 35,
+        "checks": [
+          {
+            "item": "Suggested destinations/options",
+            "met": true
+          },
+          {
+            "item": "Kept it professional",
+            "met": true
+          }
+        ]
+      },
+      {
+        "name": "Professionalism",
+        "weight": 20,
+        "points": 20,
+        "checks": [
+          {
+            "item": "No abusive language",
+            "met": true
+          }
+        ]
+      }
+    ],
+    "evidence": [
+      "What is your budget?",
+      "Okay. And when are you planning to travel, and how many nights will you be staying?",
+      "And what kind of activities do you like to do on vacations?",
+      "I recommend Manali.",
+      "Okay. Should I text you the itinerary plan we have?",
+      "I recommend hikes and rafting.",
+      "Is it a fit?"
+    ],
+    "strengths": [
+      "Good discovery coverage (origin/budget/duration/preferences).",
+      "You kept the conversation interactive with questions."
+    ],
+    "improvements": [
+      "Improve discovery: Asked departure city / origin, Asked pace/preferences."
+    ]
+  }
+}

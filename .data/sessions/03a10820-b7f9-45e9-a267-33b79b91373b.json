@@ -1,0 +1,71 @@
+{
+  "session_id": "03a10820-b7f9-45e9-a267-33b79b91373b",
+  "turn": 0,
+  "done": false,
+  "scenario_id": "family_budget",
+  "state": {
+    "slots": {
+      "travellers": "2 adults + 2 kids",
+      "kids_ages": "7 and 11",
+      "month": "April",
+      "date_window": "mid-April (flexible by ~1 week)",
+      "departure_city": "Delhi",
+      "duration": "5–7 nights (not fixed)",
+      "budget": "₹60k–₹90k per adult",
+      "budget_includes": "flights + hotels ideally",
+      "pace": "not too hectic",
+      "hotel_level": "mid-range (3–4 star)",
+      "food": "vegetarian-friendly preferred",
+      "constraints": [
+        "avoid too many hotel changes",
+        "prefer morning flights",
+        "kids get bored with long museums"
+      ],
+      "activity_style": "sightseeing + one light activity",
+      "avoid": [
+        "scuba",
+        "extreme adventure sports"
+      ],
+      "international_pref": "open only if visa is easy and total cost makes sense"
+    },
+    "disclosed": {
+      "travellers": false,
+      "kids_ages": false,
+      "month": false,
+      "date_window": false,
+      "departure_city": false,
+      "duration": false,
+      "budget": false,
+      "budget_includes": false,
+      "pace": false,
+      "hotel_level": false,
+      "food": false,
+      "constraints": false,
+      "activity_style": false,
+      "avoid": false,
+      "international_pref": false
+    },
+    "memory": {
+      "phase": "discovery",
+      "last_client_text": "",
+      "asked_weather_places": {},
+      "asked_kids_places": {},
+      "asked_visa_places": {},
+      "selected_place": "",
+      "selected_place_key": "",
+      "selected_at_turn": -1,
+      "last_places": [],
+      "asked_best_value_once": false,
+      "planning_asked": {
+        "itinerary": false,
+        "inclusions": false,
+        "stay_areas": false,
+        "transfers": false,
+        "quote": false
+      }
+    },
+    "max_turns": 12
+  },
+  "transcript": [],
+  "report": null
+}

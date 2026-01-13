@@ -1,0 +1,89 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Travel Sales Voice Coach</title>
+  <link rel="stylesheet" href="/static/styles.css" />
+</head>
+<body class="bg">
+  <div class="bgOverlay"></div>
+
+  <div class="wrap">
+    <header class="topbar">
+      <div class="brand">
+        <div class="brandMark">✈️</div>
+        <div>
+          <div class="brandTitle">Travel Sales Voice Coach</div>
+          <div class="brandSub">
+            Voice roleplay prototype • Session:
+            <code id="sid">{{ session_id }}</code>
+          </div>
+        </div>
+      </div>
+
+      <div class="topActions">
+        <a class="linkBtn" href="/report/{{ session_id }}" target="_blank" rel="noreferrer">View report</a>
+      </div>
+    </header>
+
+    <main class="grid">
+      <!-- Left: Chat -->
+      <section class="panel live">
+        <div class="panelHeader">
+          <div>
+            <div class="panelTitle">Live Conversation</div>
+            <div class="panelHint">Push-to-talk to speak as the salesperson. The client replies with voice.</div>
+          </div>
+          <div class="statusPill" id="status">Status: ready</div>
+        </div>
+
+        <div class="chat" id="chat"></div>
+
+        <div class="composer">
+          <input id="typedInput" class="input" placeholder="Optional: type a response…" autocomplete="off" />
+          <button id="btnSend" class="btn btnGhost">Send</button>
+        </div>
+
+        <div class="note">
+          Tip: Hold <b>🎙️ Push to Talk</b>, speak naturally, then release.
+        </div>
+      </section>
+
+      <!-- Right: Controls -->
+      <aside class="panel controls">
+        <div class="controlsPanel">
+          <div class="panelTitle">Controls</div>
+
+          <div class="controls">
+            <button id="btnStart" class="btn btnPrimary">Start Scenario</button>
+            <button id="btnTalk" class="btn btnMic" disabled>
+              <span class="micDot" aria-hidden="true"></span>
+              🎙️ Push to Talk
+            </button>
+            <button id="btnEnd" class="btn btnDanger" disabled>End & Generate Report</button>
+          </div>
+
+          <div class="miniCard">
+            <div class="miniTitle">Disclaimer</div>
+            <ul class="miniList">
+              <li>This is just a prototype.</li>
+              <li>Ask 1–2 questions, then pause.</li>
+              <li>After a destination is accepted, go to inclusions + stay areas.</li>
+            </ul>
+          </div>
+        </div>
+      </aside>
+    </main>
+
+    <footer class="footer">
+      <span>Chrome recommended • Works on mobile too</span>
+    </footer>
+  </div>
+
+  <script>
+    window.__SESSION_ID__ = "{{ session_id }}";
+  </script>
+  <script src="/static/app.js"></script>
+</body>
+</html>

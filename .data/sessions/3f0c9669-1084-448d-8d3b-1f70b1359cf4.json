@@ -1,0 +1,67 @@
+{
+  "session_id": "3f0c9669-1084-448d-8d3b-1f70b1359cf4",
+  "turn": 0,
+  "done": false,
+  "scenario_id": "honeymoon_premium",
+  "state": {
+    "slots": {
+      "travellers": "2 adults",
+      "month": "March",
+      "date_window": "mid-March (flexible by a few days)",
+      "departure_city": "Mumbai",
+      "duration": "6–8 nights (not fixed)",
+      "budget": "₹2.0L–₹3.5L total",
+      "budget_includes": "flights + hotels",
+      "pace": "relaxed",
+      "hotel_level": "premium (4–5 star)",
+      "food": "no strong preference",
+      "constraints": [
+        "avoid hectic transfers"
+      ],
+      "activity_style": "sightseeing + one light experience",
+      "avoid": [
+        "scuba",
+        "extreme adventure sports"
+      ],
+      "international_pref": "open, but prefers hassle-free"
+    },
+    "disclosed": {
+      "travellers": false,
+      "month": false,
+      "date_window": false,
+      "departure_city": false,
+      "duration": false,
+      "budget": false,
+      "budget_includes": false,
+      "pace": false,
+      "hotel_level": false,
+      "food": false,
+      "constraints": false,
+      "activity_style": false,
+      "avoid": false,
+      "international_pref": false
+    },
+    "memory": {
+      "phase": "discovery",
+      "last_client_text": "",
+      "asked_weather_places": {},
+      "asked_kids_places": {},
+      "asked_visa_places": {},
+      "selected_place": "",
+      "selected_place_key": "",
+      "selected_at_turn": -1,
+      "last_places": [],
+      "asked_best_value_once": false,
+      "planning_asked": {
+        "itinerary": false,
+        "inclusions": false,
+        "stay_areas": false,
+        "transfers": false,
+        "quote": false
+      }
+    },
+    "max_turns": 12
+  },
+  "transcript": [],
+  "report": null
+}

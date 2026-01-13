@@ -1,0 +1,95 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Report - {{ session_id }}</title>
+  <link rel="stylesheet" href="/static/styles.css" />
+</head>
+<body class="bg">
+  <div class="bgOverlay"></div>
+
+  <div class="wrap">
+    <header class="topbar">
+      <div class="brand">
+        <div class="brandMark">📊</div>
+        <div>
+          <div class="brandTitle">Performance Report</div>
+          <div class="brandSub">Session: <code>{{ session_id }}</code></div>
+        </div>
+      </div>
+      <div class="topActions">
+        <a class="linkBtn" href="/">Start new session</a>
+      </div>
+    </header>
+
+    <div class="scoreBox">
+      <div class="bigScore">{{ report.overall_score }}/100</div>
+      <div class="smallMeta">
+        Talk share (salesperson): {{ report.metrics.salesperson_word_share_percent }}% |
+        Questions: {{ report.metrics.question_count }} |
+        Open Qs: {{ report.metrics.open_question_count }}
+      </div>
+    </div>
+
+    <h2>Category Breakdown</h2>
+    {% for c in report.categories %}
+      <div class="card">
+        <div class="row">
+          <div class="title">{{ c.name }}</div>
+          <div class="pill">{{ c.points }} / {{ c.weight }}</div>
+        </div>
+        <ul>
+          {% for chk in c.checks %}
+            <li class="{{ 'ok' if chk.met else 'bad' }}">
+              {{ "✅" if chk.met else "❌" }} {{ chk.item }}
+            </li>
+          {% endfor %}
+        </ul>
+      </div>
+    {% endfor %}
+
+    <h2>Evidence (from your lines)</h2>
+    <div class="card">
+      {% if report.evidence|length == 0 %}
+        <p>No key evidence lines detected yet. Try asking more structured questions.</p>
+      {% else %}
+        <ul>
+          {% for e in report.evidence %}
+            <li><code>{{ e }}</code></li>
+          {% endfor %}
+        </ul>
+      {% endif %}
+    </div>
+
+    <h2>Strengths</h2>
+    <div class="card">
+      {% if report.strengths|length == 0 %}
+        <p>Not enough signals yet—do another run and focus on discovery + close.</p>
+      {% else %}
+        <ul>
+          {% for s in report.strengths %}
+            <li>✅ {{ s }}</li>
+          {% endfor %}
+        </ul>
+      {% endif %}
+    </div>
+
+    <h2>Top Improvements</h2>
+    <div class="card">
+      <ul>
+        {% for i in report.improvements %}
+          <li>🎯 {{ i }}</li>
+        {% endfor %}
+      </ul>
+    </div>
+
+    <h2>Full Transcript</h2>
+    <div class="card">
+      {% for t in transcript %}
+        <p><b>{{ t.speaker }}:</b> {{ t.text }}</p>
+      {% endfor %}
+    </div>
+  </div>
+</body>
+</html>

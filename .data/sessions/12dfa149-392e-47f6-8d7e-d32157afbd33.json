@@ -1,0 +1,162 @@
+{
+  "session_id": "12dfa149-392e-47f6-8d7e-d32157afbd33",
+  "turn": 12,
+  "done": true,
+  "scenario_id": "honeymoon_premium",
+  "state": {
+    "slots": {
+      "travellers": "2 adults",
+      "month": "March",
+      "date_window": "mid-March (flexible by a few days)",
+      "departure_city": "Mumbai",
+      "duration": "6–8 nights (not fixed)",
+      "budget": "₹2.0L–₹3.5L total",
+      "budget_includes": "flights + hotels",
+      "pace": "relaxed",
+      "hotel_level": "premium (4–5 star)",
+      "food": "no strong preference",
+      "constraints": [
+        "avoid hectic transfers"
+      ],
+      "activity_style": "sightseeing + one light experience",
+      "avoid": [
+        "scuba",
+        "extreme adventure sports"
+      ],
+      "international_pref": "open, but prefers hassle-free"
+    },
+    "disclosed": {
+      "travellers": true,
+      "month": true,
+      "date_window": true,
+      "departure_city": false,
+      "duration": false,
+      "budget": true,
+      "budget_includes": true,
+      "pace": false,
+      "hotel_level": false,
+      "food": false,
+      "constraints": false,
+      "activity_style": false,
+      "avoid": false,
+      "international_pref": false
+    },
+    "memory": {
+      "phase": "evaluation",
+      "last_client_text": "Got it—can you share a simple day-wise plan and what’s included?",
+      "asked_weather_places": {},
+      "asked_kids_places": {},
+      "asked_visa_places": {},
+      "selected_place": "Go And Look Shadeep",
+      "selected_place_key": "go and look shadeep",
+      "selected_at_turn": 4,
+      "last_places": [
+        "goa"
+      ],
+      "asked_best_value_once": false,
+      "planning_asked": {
+        "itinerary": false,
+        "inclusions": false,
+        "stay_areas": false,
+        "transfers": false,
+        "quote": true
+      }
+    },
+    "max_turns": 12
+  },
+  "transcript": [
+    {
+      "speaker": "client",
+      "text": "Hi! I’m looking to plan a trip in March with 2 adults. I’m a bit confused between places—can you shortlist 2–3 options?"
+    },
+    {
+      "speaker": "salesperson",
+      "text": "Where are you traveling from and what month?"
+    },
+    {
+      "speaker": "client",
+      "text": "March—probably mid-March (flexible by a few days), but we can shift a bit if it helps."
+    },
+    {
+      "speaker": "salesperson",
+      "text": "How many people are traveling? Any kids? And"
+    },
+    {
+      "speaker": "client",
+      "text": "We’re 2 adults."
+    },
+    {
+      "speaker": "salesperson",
+      "text": "What's your rough budget?"
+    },
+    {
+      "speaker": "client",
+      "text": "Budget is around ₹2.0L–₹3.5L total, ideally including flights + hotels."
+    },
+    {
+      "speaker": "salesperson",
+      "text": "I would suggest go and look Shadeep."
+    },
+    {
+      "speaker": "client",
+      "text": "Go And Look Shadeep sounds interesting—It could work in our budget."
+    },
+    {
+      "speaker": "salesperson",
+      "text": "I meant Goa and Laxwadeep."
+    },
+    {
+      "speaker": "client",
+      "text": "Go And Look Shadeep still sounds good for us. Unless you feel it’s a bad fit, can we finalize that first—share the day-wise plan + inclusions + best stay areas?"
+    },
+    {
+      "speaker": "salesperson",
+      "text": "Nenita is a good option."
+    },
+    {
+      "speaker": "client",
+      "text": "Got it—can you share a simple day-wise plan and what’s included?"
+    },
+    {
+      "speaker": "salesperson",
+      "text": "Nenital is a good option."
+    },
+    {
+      "speaker": "client",
+      "text": "Go And Look Shadeep still sounds good for us. Unless you feel it’s a bad fit, can we finalize that first—share the day-wise plan + inclusions + best stay areas?"
+    },
+    {
+      "speaker": "salesperson",
+      "text": "Nenital."
+    },
+    {
+      "speaker": "client",
+      "text": "Sorry—are we discussing the trip? What details do you need from me?"
+    },
+    {
+      "speaker": "salesperson",
+      "text": "Go"
+    },
+    {
+      "speaker": "client",
+      "text": "Sorry—are we discussing the trip? What details do you need from me?"
+    },
+    {
+      "speaker": "salesperson",
+      "text": "Goa and Lakshwadeep."
+    },
+    {
+      "speaker": "client",
+      "text": "Go And Look Shadeep still sounds good for us. Unless you feel it’s a bad fit, can we finalize that first—share the day-wise plan + inclusions + best stay areas?"
+    },
+    {
+      "speaker": "salesperson",
+      "text": "Goa, Lakshwadeep, and Nainital."
+    },
+    {
+      "speaker": "client",
+      "text": "Got it—can you share a simple day-wise plan and what’s included?"
+    }
+  ],
+  "report": null
+}

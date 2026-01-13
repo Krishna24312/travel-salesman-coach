@@ -1,0 +1,160 @@
+{
+  "session_id": "d9b3ca10-3bd3-42cd-83a0-97d1fdbafce5",
+  "turn": 3,
+  "done": false,
+  "scenario_id": "family_budget",
+  "state": {
+    "slots": {
+      "travellers": "2 adults + 2 kids",
+      "kids_ages": "7 and 11",
+      "month": "April",
+      "date_window": "mid-April (flexible by ~1 week)",
+      "departure_city": "Delhi",
+      "duration": "5–7 nights (not fixed)",
+      "budget": "₹60k–₹90k per adult",
+      "budget_includes": "flights + hotels ideally",
+      "pace": "not too hectic",
+      "hotel_level": "mid-range (3–4 star)",
+      "food": "vegetarian-friendly preferred",
+      "constraints": [
+        "avoid too many hotel changes",
+        "prefer morning flights",
+        "kids get bored with long museums"
+      ],
+      "activity_style": "sightseeing + one light activity",
+      "avoid": [
+        "scuba",
+        "extreme adventure sports"
+      ],
+      "international_pref": "open only if visa is easy and total cost makes sense"
+    },
+    "disclosed": {
+      "travellers": false,
+      "kids_ages": false,
+      "month": false,
+      "date_window": false,
+      "departure_city": false,
+      "duration": false,
+      "budget": true,
+      "budget_includes": true,
+      "pace": false,
+      "hotel_level": false,
+      "food": false,
+      "constraints": false,
+      "activity_style": false,
+      "avoid": false,
+      "international_pref": false
+    },
+    "memory": {
+      "phase": "discovery",
+      "last_client_text": "Budget is around ₹60k–₹90k per adult, ideally including flights + hotels ideally.",
+      "asked_weather_places": {},
+      "asked_kids_places": {},
+      "asked_visa_places": {},
+      "selected_place": "",
+      "selected_place_key": "",
+      "selected_at_turn": -1,
+      "last_places": [],
+      "asked_best_value_once": false,
+      "planning_asked": {
+        "itinerary": false,
+        "inclusions": false,
+        "stay_areas": false,
+        "transfers": false,
+        "quote": true
+      }
+    },
+    "max_turns": 12
+  },
+  "transcript": [
+    {
+      "speaker": "client",
+      "text": "Hi! I’m looking to plan a trip in April with 2 adults + 2 kids. I’m a bit confused between places—can you shortlist 2–3 options?"
+    },
+    {
+      "speaker": "salesperson",
+      "text": "What's up?"
+    },
+    {
+      "speaker": "client",
+      "text": "What 2–3 places would you suggest based on this?"
+    },
+    {
+      "speaker": "salesperson",
+      "text": "What’s your budget and does it include flights + hotels?"
+    },
+    {
+      "speaker": "client",
+      "text": "Budget is around ₹60k–₹90k per adult, ideally including flights + hotels ideally."
+    }
+  ],
+  "report": {
+    "overall_score": 38,
+    "metrics": {
+      "salesperson_word_share_percent": 0,
+      "question_count": 0,
+      "open_question_count": 0
+    },
+    "categories": [
+      {
+        "name": "Discovery",
+        "weight": 45,
+        "points": 0,
+        "checks": [
+          {
+            "item": "Asked departure city / origin",
+            "met": false
+          },
+          {
+            "item": "Asked dates/month",
+            "met": false
+          },
+          {
+            "item": "Asked duration (nights/days)",
+            "met": false
+          },
+          {
+            "item": "Asked budget",
+            "met": false
+          },
+          {
+            "item": "Asked pace/preferences",
+            "met": false
+          }
+        ]
+      },
+      {
+        "name": "Structure",
+        "weight": 35,
+        "points": 18,
+        "checks": [
+          {
+            "item": "Suggested destinations/options",
+            "met": false
+          },
+          {
+            "item": "Kept it professional",
+            "met": true
+          }
+        ]
+      },
+      {
+        "name": "Professionalism",
+        "weight": 20,
+        "points": 20,
+        "checks": [
+          {
+            "item": "No abusive language",
+            "met": true
+          }
+        ]
+      }
+    ],
+    "evidence": [],
+    "strengths": [],
+    "improvements": [
+      "Improve discovery: Asked departure city / origin, Asked dates/month, Asked duration (nights/days).",
+      "After suggesting places, offer a rough day-wise plan + 2 hotel tiers."
+    ]
+  }
+}
