@@ -11,9 +11,9 @@ from twilio.twiml.voice_response import VoiceResponse, Gather
 
 router = APIRouter()
 
-# Tuning (simple + works well for India callers too)
+# Tuning (works well for India callers too)
 VOICE_LANG = os.getenv("TWILIO_VOICE_LANG", "en-IN")
-VOICE_NAME = os.getenv("TWILIO_VOICE_NAME", "alice")  # built-in Twilio voice
+VOICE_NAME = os.getenv("TWILIO_VOICE_NAME", "alice")  # Twilio built-in voice
 
 
 def _twiml(xml: str) -> Response:
@@ -23,7 +23,7 @@ def _twiml(xml: str) -> Response:
 def _gather(prompt: Optional[str] = None) -> Gather:
     """
     Collect one spoken turn from the agent.
-    Twilio will POST SpeechResult to /twilio/turn.
+    Twilio POSTs SpeechResult to /twilio/turn.
     """
     g = Gather(
         input="speech",
@@ -41,14 +41,14 @@ def _gather(prompt: Optional[str] = None) -> Gather:
 async def twilio_voice(request: Request):
     """
     Entry point when someone calls the Twilio number.
-    Uses CallSid as session_id so your report is /report/{CallSid}.
+    Uses CallSid as session_id so report is /report/{CallSid}.
     """
     form = await request.form()
     call_sid = (form.get("CallSid") or "").strip()
 
     import main  # runtime import to avoid circular imports
 
-    # Load or create a session keyed by CallSid
+    # Load or create session keyed by CallSid
     session = main.get_or_load_session(call_sid)
     if not session:
         session = main.create_session_dict(session_id=call_sid)
@@ -56,7 +56,7 @@ async def twilio_voice(request: Request):
         main.SESSIONS[call_sid] = session
         main.save_session(session)
 
-    # Let the client open the scenario (same as /api/start)
+    # Start scenario (same as /api/start)
     client_text, _analysis, _answers, done = main.step(session, None)
     session["transcript"].append({"speaker": "client", "text": client_text})
     session["done"] = bool(done)
@@ -70,9 +70,9 @@ async def twilio_voice(request: Request):
         vr.hangup()
         return _twiml(str(vr))
 
-    # Listen for agent reply
+    # Gather agent reply
     vr.append(_gather())
-    # If silence, re-enter same flow
+    # If silence, restart gather cleanly
     vr.redirect("/twilio/voice", method="POST")
     return _twiml(str(vr))
 
@@ -80,8 +80,8 @@ async def twilio_voice(request: Request):
 @router.post("/twilio/turn")
 async def twilio_turn(request: Request):
     """
-    Called after the agent speaks. Twilio provides SpeechResult text.
-    We feed it into your existing step() and speak the client's reply.
+    Called after the agent speaks. Twilio provides SpeechResult.
+    We feed it into step() and speak the client's reply.
     """
     form = await request.form()
     call_sid = (form.get("CallSid") or "").strip()
@@ -96,13 +96,21 @@ async def twilio_turn(request: Request):
         main.SESSIONS[call_sid] = session
         main.save_session(session)
 
+    vr = VoiceResponse()
+
     if session.get("done"):
-        vr = VoiceResponse()
         vr.say("This session has already ended. Goodbye.", voice=VOICE_NAME, language=VOICE_LANG)
         vr.hangup()
         return _twiml(str(vr))
 
-    # Treat caller speech as salesperson text (optionally run your STT repair)
+    # If no speech detected, just re-prompt (don’t call step("") — it breaks flow)
+    if not speech:
+        vr.say("Sorry, I didn’t catch that. Please repeat.", voice=VOICE_NAME, language=VOICE_LANG)
+        vr.append(_gather())
+        vr.redirect("/twilio/voice", method="POST")
+        return _twiml(str(vr))
+
+    # Optional: STT repair (keeps meaning, cleans up)
     user_text_clean = speech
     if getattr(main, "USE_STT_REPAIR", False) and len(speech) >= getattr(main, "STT_REPAIR_MIN_CHARS", 8):
         try:
@@ -115,15 +123,14 @@ async def twilio_turn(request: Request):
         except Exception:
             pass
 
-    # Record salesperson line
-    session["transcript"].append({"speaker": "salesperson", "text": user_text_clean})
-
+    # IMPORTANT: do NOT append salesperson here — main.step() already appends it
     client_text, _analysis, _answers, done = main.step(session, user_text_clean)
+
+    # main.step() already appended salesperson; we append the client response
     session["transcript"].append({"speaker": "client", "text": client_text})
     session["done"] = bool(done)
     main.save_session(session)
 
-    vr = VoiceResponse()
     vr.say(client_text, voice=VOICE_NAME, language=VOICE_LANG)
 
     if session["done"]:
@@ -132,5 +139,5 @@ async def twilio_turn(request: Request):
         return _twiml(str(vr))
 
     vr.append(_gather())
-    vr.redirect("/twilio/turn", method="POST")
+    vr.redirect("/twilio/voice", method="POST")
     return _twiml(str(vr))
