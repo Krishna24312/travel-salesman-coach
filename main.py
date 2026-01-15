@@ -26,8 +26,14 @@ from fastapi.templating import Jinja2Templates
 from starlette.concurrency import run_in_threadpool
 from pydantic import BaseModel, Field
 
+# Twilio router (make this optional so local runs don't break if twilio isn't installed yet)
+try:
+    from twilio_phone import router as twilio_router  # type: ignore
+except Exception:
+    twilio_router = None  # type: ignore
+
 # -----------------------
-# Rate limiting (SlowAPI)  ✅ NEW
+# Rate limiting (SlowAPI)
 # -----------------------
 from slowapi import Limiter
 from slowapi.util import get_remote_address
@@ -58,8 +64,13 @@ log = logging.getLogger("client_sim")
 # -----------------------
 app = FastAPI()
 
+if twilio_router is not None:
+    app.include_router(twilio_router)
+else:
+    log.warning("Twilio router not loaded (twilio_phone.py or twilio package missing). Twilio endpoints disabled.")
+
 # -----------------------
-# Rate limiting (SlowAPI) ✅ NEW
+# Rate limiting (SlowAPI)
 # -----------------------
 def _client_ip(request: Request) -> str:
     """
@@ -72,13 +83,16 @@ def _client_ip(request: Request) -> str:
             return ip
     return get_remote_address(request)
 
+
 limiter = Limiter(key_func=_client_ip)
 app.state.limiter = limiter
 app.add_middleware(SlowAPIMiddleware)
 
+
 @app.exception_handler(RateLimitExceeded)
 async def _rate_limit_handler(request: Request, exc: RateLimitExceeded):
     return PlainTextResponse("Too many requests. Please slow down.", status_code=429)
+
 
 app.mount("/static", StaticFiles(directory="static"), name="static")
 templates = Jinja2Templates(directory="templates")
@@ -90,8 +104,10 @@ DATA_DIR = Path(os.getenv("DATA_DIR", ".data")).resolve()
 SESS_DIR = DATA_DIR / "sessions"
 SESS_DIR.mkdir(parents=True, exist_ok=True)
 
+
 def _session_path(session_id: str) -> Path:
     return SESS_DIR / f"{session_id}.json"
+
 
 def _json_safe(obj: Any) -> Any:
     try:
@@ -99,6 +115,7 @@ def _json_safe(obj: Any) -> Any:
         return obj
     except Exception:
         return str(obj)
+
 
 def save_session(session: Dict[str, Any]) -> None:
     sid = (session.get("session_id") or "").strip()
@@ -122,6 +139,7 @@ def save_session(session: Dict[str, Any]) -> None:
     except Exception as e:
         log.warning("Failed to persist session %s: %s", sid, e)
 
+
 def load_session_from_disk(session_id: str) -> Optional[Dict[str, Any]]:
     p = _session_path(session_id)
     if not p.exists():
@@ -132,6 +150,7 @@ def load_session_from_disk(session_id: str) -> Optional[Dict[str, Any]]:
     except Exception:
         return None
 
+
 SESSIONS: Dict[str, Dict[str, Any]] = {}
 
 # -----------------------
@@ -141,6 +160,7 @@ DEEPGRAM_API_KEY = os.getenv("DEEPGRAM_API_KEY")
 DEEPGRAM_LISTEN_URL = "https://api.deepgram.com/v1/listen"
 DEEPGRAM_MODEL = os.getenv("DEEPGRAM_MODEL", "nova-3")
 DEEPGRAM_LANG = os.getenv("DEEPGRAM_LANG", "en-IN")
+
 
 def _deepgram_request(audio_bytes: bytes, content_type: str) -> Dict[str, Any]:
     if not DEEPGRAM_API_KEY:
@@ -167,6 +187,7 @@ def _deepgram_request(audio_bytes: bytes, content_type: str) -> Dict[str, Any]:
     r.raise_for_status()
     return r.json()
 
+
 def deepgram_extract_text(dg_json: Dict[str, Any]) -> Tuple[str, float]:
     try:
         channels = (dg_json.get("results", {}) or {}).get("channels", []) or []
@@ -178,8 +199,9 @@ def deepgram_extract_text(dg_json: Dict[str, Any]) -> Tuple[str, float]:
     except Exception:
         return "", 0.0
 
+
 @app.post("/api/stt")
-@limiter.limit("10/minute")  # ✅ NEW
+@limiter.limit("10/minute")
 async def api_stt(request: Request, audio: UploadFile = File(...)):
     if not DEEPGRAM_API_KEY:
         return JSONResponse({"error": "DEEPGRAM_API_KEY not set"}, status_code=500)
@@ -198,6 +220,7 @@ async def api_stt(request: Request, audio: UploadFile = File(...)):
         return {"text": text, "confidence": conf}
     except Exception as e:
         return JSONResponse({"error": f"Deepgram STT failed: {e}"}, status_code=500)
+
 
 # -----------------------
 # LLM Providers (Groq primary, Gemini fallback)
@@ -219,6 +242,7 @@ if GEMINI_API_KEY and genai is not None:
         _gemini_client = None
         log.warning("Gemini client init failed (will disable Gemini): %s", e)
 
+
 def _safe_text(x: Any) -> str:
     if x is None:
         return ""
@@ -228,6 +252,7 @@ def _safe_text(x: Any) -> str:
         return str(x)
     except Exception:
         return ""
+
 
 def groq_generate_text(
     prompt: str,
@@ -261,6 +286,7 @@ def groq_generate_text(
         log.warning("Groq generate failed: %s", e)
         return ""
 
+
 def gemini_generate_text(
     prompt: str,
     model: str,
@@ -283,6 +309,7 @@ def gemini_generate_text(
         log.warning("Gemini generate failed: %s", msg[:240])
         return ""
 
+
 def llm_generate_text(
     prompt: str,
     purpose: str,
@@ -301,6 +328,7 @@ def llm_generate_text(
     out = gemini_generate_text(prompt, model=model, temperature=temperature, max_output_tokens=max_output_tokens)
     return out or ""
 
+
 def _safe_json(text: Any) -> Dict[str, Any]:
     s = _safe_text(text).strip()
     if not s:
@@ -317,6 +345,7 @@ def _safe_json(text: Any) -> Dict[str, Any]:
         except Exception:
             pass
     return {}
+
 
 # -----------------------
 # Scenarios
@@ -413,8 +442,10 @@ OFFER_PLAN_RX = re.compile(r"\b(send|share)\s+(the\s+)?(plan|itinerary|details|q
 QUESTIONISH = re.compile(r"\?|^(can you|could you|would you|do you|are you|what|which|where|when|how|tell me)\b", re.I)
 MAX_Q_PER_TURN = 3
 
+
 def _looks_like_question(text: str) -> bool:
     return bool(QUESTIONISH.search((text or "").strip()))
+
 
 def extract_agent_intent_fallback(agent_text: str) -> Dict[str, Any]:
     t = agent_text or ""
@@ -464,8 +495,10 @@ def extract_agent_intent_fallback(agent_text: str) -> Dict[str, Any]:
     on_topic = bool(TRAVEL_HINT.search(t) or "?" in t or signals["is_suggesting_options"] or signals["contact_request"])
     return {"on_topic": on_topic, "questions": qs, "signals": signals}
 
+
 def extract_agent_intent(agent_text: str) -> Dict[str, Any]:
     return extract_agent_intent_fallback(agent_text)
+
 
 # -----------------------
 # State / Memory helpers
@@ -476,17 +509,17 @@ def build_state_for_scenario(scenario: Dict[str, Any]) -> Dict[str, Any]:
         "slots": slots,
         "disclosed": {k: False for k in slots.keys()},
         "memory": {
-            "phase": "discovery",              # discovery -> options -> evaluation -> planning
+            "phase": "discovery",  # discovery -> options -> evaluation -> planning
             "last_client_text": "",
-            "asked_weather_places": {},        # place_key -> bool
-            "asked_kids_places": {},           # place_key -> bool
-            "asked_visa_places": {},           # place_key -> bool
-            "selected_place": "",              # canonical
-            "selected_place_key": "",          # normalized key
+            "asked_weather_places": {},
+            "asked_kids_places": {},
+            "asked_visa_places": {},
+            "selected_place": "",
+            "selected_place_key": "",
             "selected_at_turn": -1,
             "last_places": [],
             "asked_best_value_once": False,
-            "planning_asked": {                # planning prompts asked so far
+            "planning_asked": {
                 "itinerary": False,
                 "inclusions": False,
                 "stay_areas": False,
@@ -496,6 +529,7 @@ def build_state_for_scenario(scenario: Dict[str, Any]) -> Dict[str, Any]:
         },
         "max_turns": int(scenario.get("max_turns", 12)),
     }
+
 
 def create_session_dict(scenario_id: Optional[str] = None, session_id: Optional[str] = None) -> Dict[str, Any]:
     if scenario_id is None:
@@ -512,10 +546,12 @@ def create_session_dict(scenario_id: Optional[str] = None, session_id: Optional[
         "report": None,
     }
 
+
 def _norm(s: str) -> str:
     s = (s or "").lower()
     s = re.sub(r"[^a-z0-9₹ ]+", " ", s)
     return re.sub(r"\s+", " ", s).strip()
+
 
 def mark_disclosed(state: Dict[str, Any], qtype: str) -> None:
     d = state["disclosed"]
@@ -544,6 +580,7 @@ def mark_disclosed(state: Dict[str, Any], qtype: str) -> None:
     elif qtype == "domestic_vs_international":
         d["international_pref"] = True
 
+
 def budget_tier(state: Dict[str, Any]) -> int:
     b = (state["slots"].get("budget") or "").lower()
     if "₹60" in b or "₹90" in b or "60k" in b or "90k" in b:
@@ -551,6 +588,7 @@ def budget_tier(state: Dict[str, Any]) -> int:
     if "3.5" in b or "₹2.0" in b or "2.0l" in b or "3.5l" in b:
         return 3
     return 3
+
 
 def answer_for_question(state: Dict[str, Any], qtype: str) -> str:
     slots = state["slots"]
@@ -611,6 +649,7 @@ def answer_for_question(state: Dict[str, Any], qtype: str) -> str:
 
     return "Got it."
 
+
 def finalize_client_text(state: Dict[str, Any], parts: List[str], followup: str) -> str:
     text = " ".join([p.strip() for p in parts if p and p.strip()]).strip()
     if followup:
@@ -626,15 +665,37 @@ def finalize_client_text(state: Dict[str, Any], parts: List[str], followup: str)
     state["memory"]["last_client_text"] = text
     return text
 
+
 def make_llm_fn_for_places() -> Callable[[str], str]:
     def _fn(prompt: str) -> str:
         return llm_generate_text(prompt, purpose="place", temperature=0.1, max_output_tokens=220)
+
     return _fn
 
+
 _PLACE_STOP = {
-    "premium","locations","location","place","places","option","options","destination","destinations",
-    "like","such","as","a","an","the","good","best","better","great","nice"
+    "premium",
+    "locations",
+    "location",
+    "place",
+    "places",
+    "option",
+    "options",
+    "destination",
+    "destinations",
+    "like",
+    "such",
+    "as",
+    "a",
+    "an",
+    "the",
+    "good",
+    "best",
+    "better",
+    "great",
+    "nice",
 }
+
 
 def llm_extract_place_names(agent_text: str, max_places: int = 3) -> List[str]:
     if not GROQ_API_KEY and _gemini_client is None:
@@ -675,6 +736,7 @@ TEXT:
             break
     return cleaned
 
+
 def _accepted_fit_from_reaction(reaction: str) -> bool:
     r = (reaction or "").lower()
     if "sounds interesting" not in r:
@@ -682,8 +744,9 @@ def _accepted_fit_from_reaction(reaction: str) -> bool:
     bad = ("pricey side", "go over budget", "worried it might")
     return not any(b in r for b in bad)
 
+
 # -----------------------
-# Planning helpers (NEW)
+# Planning helpers
 # -----------------------
 PLANNING_COVER_RX = {
     "itinerary": re.compile(r"\b(itinerary|day[- ]wise|day wise|plan)\b", re.I),
@@ -693,12 +756,14 @@ PLANNING_COVER_RX = {
     "quote": re.compile(r"\b(quote|price|cost|budget|breakup|per person|per adult|package cost)\b", re.I),
 }
 
+
 def _mark_planning_coverage_from_agent(mem: Dict[str, Any], agent_text: str) -> None:
     asked = mem.get("planning_asked") or {}
     for k, rx in PLANNING_COVER_RX.items():
         if rx.search(agent_text or ""):
             asked[k] = True
     mem["planning_asked"] = asked
+
 
 def _next_planning_followup(mem: Dict[str, Any], place: str) -> str:
     asked = mem.get("planning_asked") or {}
@@ -729,8 +794,9 @@ def _next_planning_followup(mem: Dict[str, Any], place: str) -> str:
 
     return "Okay—what would be the next step to proceed if we want to book?"
 
+
 # -----------------------
-# step() (UPDATED FLOW)
+# step() (UPDATED FLOW + MEMORY FIX)
 # -----------------------
 def step(session: Dict[str, Any], agent_text: Optional[str]) -> Tuple[str, Dict[str, Any], List[Dict[str, Any]], bool]:
     state = session["state"]
@@ -796,6 +862,12 @@ def step(session: Dict[str, Any], agent_text: Optional[str]) -> Tuple[str, Dict[
         signals["is_suggesting_options"] = True
         signals["mentioned_places"] = places
         mem["last_places"] = places[:]
+
+    # ✅ MEMORY FIX:
+    # If we've already selected a place, we should not treat short confirmations
+    # ("yes", "it's beautiful", etc.) as off-topic.
+    if mem.get("selected_place"):
+        on_topic = True
 
     # Off-topic fallback
     if (not on_topic) and (not questions) and (not TRAVEL_HINT.search(agent_text)) and (not places):
@@ -911,6 +983,7 @@ def step(session: Dict[str, Any], agent_text: Optional[str]) -> Tuple[str, Dict[
     done = session["turn"] >= state.get("max_turns", 12)
     return client_text, {"on_topic": True, "questions": questions, "signals": signals, "answered_all": True}, answers, done
 
+
 # -----------------------
 # STT Repair (optional)
 # -----------------------
@@ -918,18 +991,81 @@ USE_STT_REPAIR = True
 STT_REPAIR_MIN_CHARS = 8
 
 _STOPWORDS = {
-    "a","an","the","and","or","but","so","to","of","in","on","for","with","at","from","as",
-    "is","am","are","was","were","be","been","being",
-    "i","you","we","they","he","she","it","my","your","our","their",
-    "this","that","these","those",
-    "what","when","where","which","who","how","why",
-    "please","plz","kindly","just","okay","ok","yeah","yep","no","yes",
-    "do","did","does","can","could","would","should","will",
-    "me","us","them","him","her",
+    "a",
+    "an",
+    "the",
+    "and",
+    "or",
+    "but",
+    "so",
+    "to",
+    "of",
+    "in",
+    "on",
+    "for",
+    "with",
+    "at",
+    "from",
+    "as",
+    "is",
+    "am",
+    "are",
+    "was",
+    "were",
+    "be",
+    "been",
+    "being",
+    "i",
+    "you",
+    "we",
+    "they",
+    "he",
+    "she",
+    "it",
+    "my",
+    "your",
+    "our",
+    "their",
+    "this",
+    "that",
+    "these",
+    "those",
+    "what",
+    "when",
+    "where",
+    "which",
+    "who",
+    "how",
+    "why",
+    "please",
+    "plz",
+    "kindly",
+    "just",
+    "okay",
+    "ok",
+    "yeah",
+    "yep",
+    "no",
+    "yes",
+    "do",
+    "did",
+    "does",
+    "can",
+    "could",
+    "would",
+    "should",
+    "will",
+    "me",
+    "us",
+    "them",
+    "him",
+    "her",
 }
+
 
 def _tok_words(s: str) -> List[str]:
     return re.findall(r"[a-zA-Z']+", (s or "").lower())
+
 
 def accept_repair(raw: str, clean: str) -> Tuple[bool, str]:
     raw = (raw or "").strip()
@@ -959,6 +1095,7 @@ def accept_repair(raw: str, clean: str) -> Tuple[bool, str]:
         return False, "too_long"
 
     return True, "ok"
+
 
 def repair_stt_with_llm(raw: str) -> Dict[str, Any]:
     raw = (raw or "").strip()
@@ -998,15 +1135,18 @@ RAW_STT:
 
     return {"clean": clean, "can_repair": can_repair, "reason": reason or "ok"}
 
+
 # -----------------------
 # API Models
 # -----------------------
 class StartReq(BaseModel):
     session_id: str = Field(...)
 
+
 class TurnReq(BaseModel):
     session_id: str = Field(...)
     user_text: str = Field("", description="Agent text (typed or STT)")
+
 
 # -----------------------
 # Pages + API
@@ -1033,6 +1173,7 @@ def get_or_load_session(session_id: str) -> Optional[Dict[str, Any]]:
     SESSIONS[session_id] = session
     return session
 
+
 @app.get("/", response_class=HTMLResponse)
 async def index(request: Request):
     session_id = str(uuid.uuid4())
@@ -1042,8 +1183,9 @@ async def index(request: Request):
     save_session(session)
     return templates.TemplateResponse("index.html", {"request": request, "session_id": session_id})
 
+
 @app.get("/health")
-@limiter.limit("60/minute")  # ✅ NEW
+@limiter.limit("60/minute")
 async def health(request: Request):
     return {
         "ok": True,
@@ -1054,10 +1196,12 @@ async def health(request: Request):
             "gemini_client_model": GEMINI_CLIENT_MODEL,
             "gemini_repair_model": GEMINI_REPAIR_MODEL,
         },
+        "twilio_router_loaded": bool(twilio_router is not None),
     }
 
+
 @app.post("/api/start")
-@limiter.limit("10/minute")  # ✅ NEW
+@limiter.limit("10/minute")
 async def api_start(request: Request, payload: StartReq):
     session = get_or_load_session(payload.session_id)
     if not session:
@@ -1069,13 +1213,15 @@ async def api_start(request: Request, payload: StartReq):
     save_session(session)
     return {"client_text": client_text, "analysis": analysis, "answers": answers, "done": done}
 
+
 @app.post("/api/start/")
-@limiter.limit("10/minute")  # ✅ NEW (limit slash alias too)
+@limiter.limit("10/minute")
 async def api_start_slash(request: Request, payload: StartReq):
     return await api_start(request, payload)
 
+
 @app.post("/api/turn")
-@limiter.limit("30/minute")  # ✅ NEW
+@limiter.limit("30/minute")
 async def api_turn(request: Request, payload: TurnReq):
     session = get_or_load_session(payload.session_id)
     if not session:
@@ -1130,10 +1276,12 @@ async def api_turn(request: Request, payload: TurnReq):
         "stt_reason": stt_reason,
     }
 
+
 @app.post("/api/turn/")
-@limiter.limit("30/minute")  # ✅ NEW (limit slash alias too)
+@limiter.limit("30/minute")
 async def api_turn_slash(request: Request, payload: TurnReq):
     return await api_turn(request, payload)
+
 
 # -----------------------
 # REPORTING
@@ -1141,10 +1289,11 @@ async def api_turn_slash(request: Request, payload: TurnReq):
 def _count_words(s: str) -> int:
     return len(re.findall(r"\b[\w']+\b", s or ""))
 
+
 def build_performance_report(session: Dict[str, Any]) -> Dict[str, Any]:
     transcript = session.get("transcript", []) or []
-    sales_lines = [t.get("text","") for t in transcript if t.get("speaker") == "salesperson"]
-    client_lines = [t.get("text","") for t in transcript if t.get("speaker") == "client"]
+    sales_lines = [t.get("text", "") for t in transcript if t.get("speaker") == "salesperson"]
+    client_lines = [t.get("text", "") for t in transcript if t.get("speaker") == "client"]
 
     sales_words = sum(_count_words(x) for x in sales_lines)
     client_words = sum(_count_words(x) for x in client_lines)
@@ -1235,8 +1384,9 @@ def build_performance_report(session: Dict[str, Any]) -> Dict[str, Any]:
         "improvements": improvements[:8],
     }
 
+
 @app.post("/api/end")
-@limiter.limit("10/minute")  # ✅ NEW
+@limiter.limit("10/minute")
 async def api_end(request: Request, payload: Dict[str, Any]):
     session_id = (payload.get("session_id") or "").strip()
     session = get_or_load_session(session_id)
@@ -1250,10 +1400,12 @@ async def api_end(request: Request, payload: Dict[str, Any]):
 
     return {"ok": True, "report_url": f"/report/{session_id}"}
 
+
 @app.post("/api/end/")
-@limiter.limit("10/minute")  # ✅ NEW (limit slash alias too)
+@limiter.limit("10/minute")
 async def api_end_slash(request: Request, payload: Dict[str, Any]):
     return await api_end(request, payload)
+
 
 @app.get("/report/{session_id}", response_class=HTMLResponse)
 async def report_page(request: Request, session_id: str):
